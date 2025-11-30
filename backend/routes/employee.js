@@ -2,8 +2,12 @@ const express = require("express");
 const { body, query, param } = require("express-validator");
 const validate = require("../middleware/validate");
 const controller = require("../controllers/employeeController");
+const auth = require("../middleware/auth");
 
 const employeeRouter = express.Router();
+
+// Apply authentication middleware to all employee routes
+employeeRouter.use(auth);
 
 // Validation rules for employee creation
 const createEmployeeValidationRules = [

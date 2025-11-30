@@ -7,7 +7,7 @@ const userRoutes = require("./routes/user");
 const employeeRoutes = require("./routes/employee");
 
 // Database Setup
-const DB_CONNECTION_STRING = process.env.DB_CONNECTION_STRING || "";
+const DB_CONNECTION_STRING = process.env.MONGO_URI || "";
 const PORT = process.env.PORT || 3000;
 const app = express();
 

@@ -1,0 +1,20 @@
+services:
+  comp3123-mongo:
+    image: mongo:7
+    container_name: comp3123-mongo
+    environment:
+      MONGO_INITDB_DATABASE: comp3123_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./backend/mongo-data:/data/db
+
+  comp3123-backend:
+    build: ./backend
+    container_name: comp3123-backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - comp3123-mongo

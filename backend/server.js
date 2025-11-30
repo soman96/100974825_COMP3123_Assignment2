@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 require("dotenv").config();
 
 // Importing Route Handlers
@@ -10,6 +11,9 @@ const employeeRoutes = require("./routes/employee");
 const DB_CONNECTION_STRING = process.env.MONGO_URI || "";
 const PORT = process.env.PORT || 3000;
 const app = express();
+
+// Setup CORS
+app.use(cors());
 
 // Middleware to parse JSON and URL-encoded data
 app.use(express.json());

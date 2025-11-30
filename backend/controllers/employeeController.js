@@ -90,3 +90,24 @@ exports.deleteEmployee = async (req, res) => {
     });
   }
 };
+
+// Search employees by department or position
+exports.searchEmployees = async (req, res) => {
+  const { department, position } = req.query;
+
+  try {
+    
+    const query = {};
+    if (department) query.department = department;
+    if (position) query.position = position;
+
+    const results = await EmployeeModel.find(query);
+
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({
+      status: "false",
+      errors: [{ message: error.message }],
+    });
+  }
+};

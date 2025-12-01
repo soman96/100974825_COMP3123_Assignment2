@@ -16,6 +16,9 @@ const EmployeeEdit = () => {
     department: "",
   });
 
+  const [profilePicFile, setProfilePicFile] = useState(null); // NEW
+  const [currentProfilePic, setCurrentProfilePic] = useState(null); // NEW
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -33,10 +36,13 @@ const EmployeeEdit = () => {
         position: emp.position || "",
         salary: emp.salary !== undefined ? emp.salary : "",
         date_of_joining: emp.date_of_joining
-          ? new Date(emp.date_of_joining).toISOString().slice(0, 10) // formet as YYYY-MM-DD
+          ? new Date(emp.date_of_joining).toISOString().slice(0, 10)
           : "",
         department: emp.department || "",
       });
+
+      // Load existing profile picture
+      setCurrentProfilePic(emp.profile_picture || null); // NEW
 
       setError("");
     } catch (err) {
@@ -63,21 +69,41 @@ const EmployeeEdit = () => {
     }));
   };
 
+  // Handle selecting file
+  const handleProfilePicChange = (e) => {
+    setProfilePicFile(e.target.files[0] || null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     setError("");
 
     try {
-      // salary as number
-      const payload = {
-        ...form,
-        salary: form.salary === "" ? undefined : Number(form.salary),
-      };
+      // Build FormData (fields + optional file)
+      const formData = new FormData();
 
-      await api.put(`/emp/employees/${id}`, payload);
+      formData.append("first_name", form.first_name);
+      formData.append("last_name", form.last_name);
+      formData.append("email", form.email);
+      formData.append("position", form.position);
+      formData.append("department", form.department);
 
-      // After successful update, go back to list
+      if (form.salary !== "") {
+        formData.append("salary", String(Number(form.salary)));
+      }
+
+      formData.append("date_of_joining", form.date_of_joining);
+
+      if (profilePicFile) {
+        formData.append("profile_picture", profilePicFile);
+      }
+
+      // Single PUT to backend (multer + body fields together)
+      await api.put(`/emp/employees/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       navigate("/employees");
     } catch (err) {
       const msg =
@@ -119,7 +145,31 @@ const EmployeeEdit = () => {
 
       <div className="card bg-dark text-light border-secondary">
         <div className="card-body">
+
+          {currentProfilePic && (
+            <div className="text-center mb-4">
+              <img
+                src={`http://localhost:3000${currentProfilePic}`}
+                alt="Profile"
+                className="img-thumbnail"
+                style={{ maxWidth: "180px", borderRadius: "10px" }}
+              />
+            </div>
+          )}
+
           <form onSubmit={handleSubmit}>
+
+            {/* Profile picture input */}
+            <div className="mb-3">
+              <label className="form-label">Profile Picture (Optional)</label>
+              <input
+                type="file"
+                accept="image/*"
+                className="form-control"
+                onChange={handleProfilePicChange}
+              />
+            </div>
+
             <div className="row mb-3">
               <div className="col-md-6 mb-3">
                 <label className="form-label">First Name</label>
@@ -229,7 +279,9 @@ const EmployeeEdit = () => {
                 {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
+
           </form>
+
         </div>
       </div>
     </div>

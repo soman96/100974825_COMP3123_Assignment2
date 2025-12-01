@@ -11,7 +11,9 @@ exports.createEmployee = async (req, res) => {
 
   try {
     const savedEmployee = await newEmployee.save();
-    res.status(201).json({ message: "Employee created successfully", employee_id: savedEmployee._id });
+    res
+      .status(201)
+      .json({ message: "Employee created successfully", employee_id: savedEmployee._id });
   } catch (error) {
     res.status(500).json({
       status: "false",
@@ -59,7 +61,6 @@ exports.updateEmployee = async (req, res) => {
   const { eid } = req.params;
 
   try {
-
     const updateData = { ...req.body };
 
     // If a new profile picture was uploaded, update the path
@@ -67,7 +68,12 @@ exports.updateEmployee = async (req, res) => {
       updateData.profile_picture = `/uploads/${req.file.filename}`;
     }
 
-    const updatedEmployee = await EmployeeModel.findByIdAndUpdate(eid, req.body, { new: true, runValidators: true });
+    const updatedEmployee = await EmployeeModel.findByIdAndUpdate(
+      eid,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
     if (!updatedEmployee) {
       return res.status(404).json({
         status: "false",

@@ -15,6 +15,9 @@ const EmployeeAdd = () => {
     department: "",
   });
 
+  // New state for profile picture file
+  const [profilePicture, setProfilePicture] = useState(null);
+
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -23,8 +26,15 @@ const EmployeeAdd = () => {
 
     setForm((prev) => ({
       ...prev,
+      // Keep salary numeric-only string
       [name]: name === "salary" ? value.replace(/[^\d.]/g, "") : value,
     }));
+  };
+
+  // Handle file selection
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    setProfilePicture(file);
   };
 
   const handleSubmit = async (e) => {
@@ -33,14 +43,32 @@ const EmployeeAdd = () => {
     setError("");
 
     try {
-      const payload = {
-        ...form,
-        salary: form.salary === "" ? undefined : Number(form.salary),
-      };
+      // Build FormData instead of JSON
+      const formData = new FormData();
 
-      await api.post("/emp/employees", payload);
+      formData.append("first_name", form.first_name);
+      formData.append("last_name", form.last_name);
+      formData.append("email", form.email);
+      formData.append("position", form.position);
+      formData.append("department", form.department);
 
-      // Go back to employee list after makign new employee
+      // Convert salary to number if provided
+      if (form.salary !== "") {
+        formData.append("salary", String(Number(form.salary)));
+      }
+
+      // Date of joining as string (YYYY-MM-DD)
+      formData.append("date_of_joining", form.date_of_joining);
+
+      // Append profile picture file if user selected one
+      if (profilePicture) {
+        formData.append("profile_picture", profilePicture);
+      }
+
+      // Axios will automatically set Content-Type: multipart/form-data
+      await api.post("/emp/employees", formData);
+
+      // Go back to employee list after making new employee
       navigate("/employees");
     } catch (err) {
       const msg =
@@ -169,6 +197,17 @@ const EmployeeAdd = () => {
                   required
                 />
               </div>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Profile Picture (Optional)</label>
+              <input
+                type="file"
+                name="profile_picture"
+                className="form-control"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
             </div>
 
             <div className="d-flex justify-content-end">

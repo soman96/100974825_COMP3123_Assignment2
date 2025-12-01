@@ -2,11 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api";
 
-const capitalize = (str = "") =>
-  str.length === 0 ? "" : str.charAt(0).toUpperCase() + str.slice(1);
-
 const EmployeeView = () => {
-  const { id } = useParams(); // from /employees/:id/view
+  const { id } = useParams();
   const navigate = useNavigate();
   const [employee, setEmployee] = useState(null);
   const [error, setError] = useState("");
@@ -30,7 +27,6 @@ const EmployeeView = () => {
 
   useEffect(() => {
     fetchEmployee();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const handleBack = () => {
@@ -69,22 +65,6 @@ const EmployeeView = () => {
     );
   }
 
-  const fullName = `${capitalize(employee.first_name)} ${capitalize(
-    employee.last_name
-  )}`;
-
-  const formattedSalary =
-    typeof employee.salary === "number"
-      ? employee.salary.toLocaleString("en-CA", {
-          style: "currency",
-          currency: "CAD",
-        })
-      : employee.salary;
-
-  const formattedDate = employee.date_of_joining
-    ? new Date(employee.date_of_joining).toLocaleDateString("en-CA")
-    : "";
-
   return (
     <div className="container mt-4 text-light">
       <div className="mb-3 d-flex justify-content-between align-items-center">
@@ -96,29 +76,30 @@ const EmployeeView = () => {
 
       <div className="card bg-dark text-light border-secondary">
         <div className="card-body">
-          <h4 className="card-title mb-3">{fullName}</h4>
-
-          <div className="mb-2">
-            <strong>Position:</strong>{" "}
-            {employee.position ? employee.position : "-"}
-          </div>
-
-          <div className="mb-2">
-            <strong>Department:</strong>{" "}
-            {employee.department ? employee.department : "-"}
-          </div>
+          <h4 className="card-title">
+            {employee.first_name} {employee.last_name}
+          </h4>
+          <h6 className="card-subtitle mb-3 text-muted">
+            {employee.position} &middot; {employee.department}
+          </h6>
 
           <div className="mb-2">
             <strong>Email:</strong> {employee.email}
           </div>
 
-          <div className="mb-2">
-            <strong>Salary:</strong> {formattedSalary}
-          </div>
+          {employee.salary !== undefined && (
+            <div className="mb-2">
+              <strong>Salary:</strong> {employee.salary}
+            </div>
+          )}
 
-          <div className="mb-2">
-            <strong>Date of Hire:</strong> {formattedDate}
-          </div>
+          {employee.date_of_joining && (
+            <div className="mb-2">
+              <strong>Date of Joining:</strong>{" "}
+              {new Date(employee.date_of_joining).toLocaleDateString()}
+            </div>
+          )}
+
         </div>
       </div>
     </div>

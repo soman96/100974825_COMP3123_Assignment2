@@ -1,23 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import EmployeeList from "./pages/EmployeeList";
+import EmployeeView from "./pages/EmployeeView";
+import EmployeeEdit from "./pages/EmployeeEdit";
+import Navbar from "./components/Navbar";
+
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Navbar />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/employees/:id/view" element={<ProtectedRoute><EmployeeView /></ProtectedRoute>} />
+        <Route
+  path="/employees/:id/edit"
+  element={
+    <ProtectedRoute>
+      <EmployeeEdit />
+    </ProtectedRoute>
+  }
+/>
+
+        <Route
+          path="/employees"
+          element={
+            <ProtectedRoute>
+              <EmployeeList />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Default route */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
     </div>
   );
 }

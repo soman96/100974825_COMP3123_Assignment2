@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../api";
 
 const EmployeeEdit = () => {
-  const { id } = useParams(); // /employees/:id/edit
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -16,8 +16,8 @@ const EmployeeEdit = () => {
     department: "",
   });
 
-  const [profilePicFile, setProfilePicFile] = useState(null); // NEW
-  const [currentProfilePic, setCurrentProfilePic] = useState(null); // NEW
+  const [profilePicFile, setProfilePicFile] = useState(null);
+  const [currentProfilePic, setCurrentProfilePic] = useState(null);
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ const EmployeeEdit = () => {
       });
 
       // Load existing profile picture
-      setCurrentProfilePic(emp.profile_picture || null); // NEW
+      setCurrentProfilePic(emp.profile_picture || null);
 
       setError("");
     } catch (err) {
@@ -80,7 +80,7 @@ const EmployeeEdit = () => {
     setError("");
 
     try {
-      // Build FormData (fields + optional file)
+      // Build formdata
       const formData = new FormData();
 
       formData.append("first_name", form.first_name);
@@ -99,7 +99,7 @@ const EmployeeEdit = () => {
         formData.append("profile_picture", profilePicFile);
       }
 
-      // Single PUT to backend (multer + body fields together)
+      // Send update request
       await api.put(`/emp/employees/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -158,17 +158,6 @@ const EmployeeEdit = () => {
           )}
 
           <form onSubmit={handleSubmit}>
-
-            {/* Profile picture input */}
-            <div className="mb-3">
-              <label className="form-label">Profile Picture (Optional)</label>
-              <input
-                type="file"
-                accept="image/*"
-                className="form-control"
-                onChange={handleProfilePicChange}
-              />
-            </div>
 
             <div className="row mb-3">
               <div className="col-md-6 mb-3">
@@ -262,6 +251,16 @@ const EmployeeEdit = () => {
                   value={form.date_of_joining}
                   onChange={handleChange}
                   required
+                />
+              </div>
+
+                <div className="mb-3">
+                <label className="form-label">Profile Picture (Optional)</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="form-control"
+                  onChange={handleProfilePicChange}
                 />
               </div>
             </div>

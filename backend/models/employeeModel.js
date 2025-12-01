@@ -45,6 +45,12 @@ const employeeSchema = new mongoose.Schema(
       trim: true,
       maxlength: [50, "Department cannot exceed 50 characters"],
     },
+    // Profile pic URL
+    profile_picture: {
+      type: String,
+      required: false,
+      trim: true,
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at", select: false },

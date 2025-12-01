@@ -5,6 +5,8 @@ import Signup from "./pages/Signup";
 import EmployeeList from "./pages/EmployeeList";
 import EmployeeView from "./pages/EmployeeView";
 import EmployeeEdit from "./pages/EmployeeEdit";
+import EmployeeAdd from "./pages/EmployeeAdd";
+
 import Navbar from "./components/Navbar";
 
 const ProtectedRoute = ({ children }) => {
@@ -22,26 +24,12 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+
+        <Route path="/employees" element={<ProtectedRoute><EmployeeList /></ProtectedRoute>} />
+        <Route path="/employees/add" element={<ProtectedRoute><EmployeeAdd /></ProtectedRoute>} />
         <Route path="/employees/:id/view" element={<ProtectedRoute><EmployeeView /></ProtectedRoute>} />
-        <Route
-  path="/employees/:id/edit"
-  element={
-    <ProtectedRoute>
-      <EmployeeEdit />
-    </ProtectedRoute>
-  }
-/>
+        <Route path="/employees/:id/edit" element={<ProtectedRoute><EmployeeEdit /></ProtectedRoute>} />
 
-        <Route
-          path="/employees"
-          element={
-            <ProtectedRoute>
-              <EmployeeList />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Default route */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>

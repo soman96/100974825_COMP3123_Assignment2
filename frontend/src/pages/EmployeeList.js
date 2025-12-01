@@ -103,7 +103,7 @@ const EmployeeList = () => {
                     </button>
 
                     <button
-                      className="btn btn-sm btn-primary me-2"
+                      className="btn btn-sm btn-warning me-2"
                       onClick={() => handleEdit(emp._id)}
                     >
                       Edit

@@ -19,6 +19,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve pictures files statically
+app.use("/uploads", express.static("uploads"));
+
 // Mounting Routers
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/emp/employees", employeeRoutes);

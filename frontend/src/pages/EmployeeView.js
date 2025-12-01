@@ -76,6 +76,18 @@ const EmployeeView = () => {
 
       <div className="card bg-dark text-light border-secondary">
         <div className="card-body">
+
+          {employee.profile_picture && (
+            <div className="mb-3 text-center">
+              <img
+                src={`http://localhost:3000${employee.profile_picture}`}
+                alt="Profile"
+                className="img-thumbnail"
+                style={{ maxWidth: "180px", borderRadius: "10px" }}
+              />
+            </div>
+          )}
+
           <h4 className="card-title">
             {employee.first_name} {employee.last_name}
           </h4>

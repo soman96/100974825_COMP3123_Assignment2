@@ -6,7 +6,6 @@ const EmployeeList = () => {
   const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
   const [error, setError] = useState("");
-  const [search, setSearch] = useState({ department: "", position: "" });
 
   const fetchEmployees = async () => {
     try {
@@ -18,28 +17,6 @@ const EmployeeList = () => {
         err.response?.data?.message ||
         err.response?.data?.errors?.[0]?.message ||
         "Failed to fetch employees";
-      setError(msg);
-    }
-  };
-
-  const handleSearchChange = (e) =>
-    setSearch((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-
-  const handleSearchSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const params = {};
-      if (search.department) params.department = search.department;
-      if (search.position) params.position = search.position;
-
-      const res = await api.get("/emp/employees/search", { params });
-      setEmployees(res.data || []);
-      setError("");
-    } catch (err) {
-      const msg =
-        err.response?.data?.message ||
-        err.response?.data?.errors?.[0]?.message ||
-        "Search failed";
       setError(msg);
     }
   };
@@ -73,8 +50,14 @@ const EmployeeList = () => {
 
   return (
     <div className="container mt-4 text-light">
-      <div className="mb-4">
+      <div className="mb-3 d-flex justify-content-between align-items-center">
         <h2>Employees</h2>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/employees/add")}
+        >
+          Add Employee
+        </button>
       </div>
 
       {error && (

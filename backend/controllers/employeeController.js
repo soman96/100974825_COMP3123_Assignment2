@@ -4,6 +4,11 @@ const EmployeeModel = require("../models/employeeModel");
 exports.createEmployee = async (req, res) => {
   const newEmployee = new EmployeeModel(req.body);
 
+  // If pfp is uploaded, store its path in the db
+  if (req.file) {
+    newEmployee.profile_picture = `/uploads/${req.file.filename}`;
+  }
+
   try {
     const savedEmployee = await newEmployee.save();
     res.status(201).json({ message: "Employee created successfully", employee_id: savedEmployee._id });
@@ -54,6 +59,14 @@ exports.updateEmployee = async (req, res) => {
   const { eid } = req.params;
 
   try {
+
+    const updateData = { ...req.body };
+
+    // If a new profile picture was uploaded, update the path
+    if (req.file) {
+      updateData.profile_picture = `/uploads/${req.file.filename}`;
+    }
+
     const updatedEmployee = await EmployeeModel.findByIdAndUpdate(eid, req.body, { new: true, runValidators: true });
     if (!updatedEmployee) {
       return res.status(404).json({

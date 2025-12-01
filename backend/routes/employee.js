@@ -3,6 +3,7 @@ const { body, query, param } = require("express-validator");
 const validate = require("../middleware/validate");
 const controller = require("../controllers/employeeController");
 const auth = require("../middleware/auth");
+const upload = require("../middleware/upload");
 
 const employeeRouter = express.Router();
 
@@ -46,7 +47,7 @@ employeeRouter.get(
 );
 
 // Create a new employee
-employeeRouter.post("/", createEmployeeValidationRules, validate, controller.createEmployee);
+employeeRouter.post("/", upload.single("profile_picture"), createEmployeeValidationRules, validate, controller.createEmployee);
 
 // Get all employees
 employeeRouter.get("/", controller.getAllEmployees);
@@ -55,7 +56,7 @@ employeeRouter.get("/", controller.getAllEmployees);
 employeeRouter.get("/:eid", employeeIdValidationRule, validate, controller.getEmployeeById);
 
 // Update an existing employee by ID
-employeeRouter.put("/:eid", employeeIdValidationRule.concat(updateEmployeeValidationRules), validate, controller.updateEmployee);
+employeeRouter.put("/:eid", upload.single("profile_picture"), employeeIdValidationRule.concat(updateEmployeeValidationRules), validate, controller.updateEmployee);
 
 // Delete an employee by ID using query parameter
 employeeRouter.delete("/", query("eid").isMongoId().withMessage("Invalid employee ID"), validate, controller.deleteEmployee);

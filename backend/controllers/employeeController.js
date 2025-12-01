@@ -96,10 +96,14 @@ exports.searchEmployees = async (req, res) => {
   const { department, position } = req.query;
 
   try {
-    
     const query = {};
-    if (department) query.department = department;
-    if (position) query.position = position;
+    if (department) {
+      query.department = { $regex: department, $options: "i" };
+    }
+
+    if (position) {
+      query.position = { $regex: position, $options: "i" };
+    }
 
     const results = await EmployeeModel.find(query);
 

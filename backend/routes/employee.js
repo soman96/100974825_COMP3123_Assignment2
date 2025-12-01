@@ -34,6 +34,17 @@ const updateEmployeeValidationRules = [
 // Validation rules for employee ID parameter
 const employeeIdValidationRule = [param("eid").isMongoId().withMessage("Invalid employee ID")];
 
+// Search employees by department or position
+employeeRouter.get(
+  "/search",
+  [
+    query("department").optional().isLength({ max: 50 }).withMessage("Department cannot exceed 50 characters"),
+    query("position").optional().isLength({ max: 50 }).withMessage("Position cannot exceed 50 characters"),
+  ],
+  validate,
+  controller.searchEmployees
+);
+
 // Create a new employee
 employeeRouter.post("/", createEmployeeValidationRules, validate, controller.createEmployee);
 
@@ -48,16 +59,5 @@ employeeRouter.put("/:eid", employeeIdValidationRule.concat(updateEmployeeValida
 
 // Delete an employee by ID using query parameter
 employeeRouter.delete("/", query("eid").isMongoId().withMessage("Invalid employee ID"), validate, controller.deleteEmployee);
-
-// Search employees by department or position
-employeeRouter.get(
-  "/search",
-  [
-    query("department").optional().isLength({ max: 50 }).withMessage("Department cannot exceed 50 characters"),
-    query("position").optional().isLength({ max: 50 }).withMessage("Position cannot exceed 50 characters"),
-  ],
-  validate,
-  controller.searchEmployees
-);
 
 module.exports = employeeRouter;

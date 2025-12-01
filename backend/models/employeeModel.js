@@ -1,128 +1,61 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import api from "../api";
+const mongoose = require("mongoose");
 
-const capitalize = (str = "") =>
-  str.length === 0 ? "" : str.charAt(0).toUpperCase() + str.slice(1);
-
-const EmployeeView = () => {
-  const { id } = useParams(); // from /employees/:id/view
-  const navigate = useNavigate();
-  const [employee, setEmployee] = useState(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  const fetchEmployee = async () => {
-    try {
-      const res = await api.get(`/emp/employees/${id}`);
-      setEmployee(res.data);
-      setError("");
-    } catch (err) {
-      const msg =
-        err.response?.data?.errors?.[0]?.message ||
-        err.response?.data?.message ||
-        "Failed to fetch employee details";
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEmployee();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  const handleBack = () => {
-    navigate("/employees");
-  };
-
-  if (loading) {
-    return (
-      <div className="container mt-4 text-light">
-        <p>Loading employee details...</p>
-      </div>
-    );
+const employeeSchema = new mongoose.Schema(
+  {
+    first_name: {
+      type: String,
+      required: [true, "First name is required"],
+      trim: true,
+      maxlength: [30, "First name cannot exceed 30 characters"],
+      lowercase: true,
+    },
+    last_name: {
+      type: String,
+      required: [true, "Last name is required"],
+      trim: true,
+      maxlength: [30, "Last name cannot exceed 30 characters"],
+      lowercase: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      match: [/.+\@.+\..+/, "Please fill a valid email address"],
+      lowercase: true,
+      trim: true,
+    },
+    position: {
+      type: String,
+      required: [true, "Position is required"],
+      trim: true,
+      maxlength: [50, "Position cannot exceed 50 characters"],
+    },
+    salary: {
+      type: Number,
+      required: [true, "Salary is required"],
+      min: [0, "Salary cannot be negative"],
+    },
+    date_of_joining: {
+      type: Date,
+      required: [true, "Date of hire is required"],
+    },
+    department: {
+      type: String,
+      required: [true, "Department is required"],
+      trim: true,
+      maxlength: [50, "Department cannot exceed 50 characters"],
+    },
+  },
+  {
+    timestamps: { createdAt: "created_at", updatedAt: "updated_at", select: false },
   }
+);
 
-  if (error) {
-    return (
-      <div className="container mt-4 text-light">
-        <div className="alert alert-danger" role="alert">
-          {error}
-        </div>
-        <button className="btn btn-secondary" onClick={handleBack}>
-          Back to Employees
-        </button>
-      </div>
-    );
-  }
+// Exclude created_at and updated_at from query results by default
+employeeSchema.path("created_at").select(false);
+employeeSchema.path("updated_at").select(false);
+// Remove version from JSON output
+employeeSchema.set("toJSON", { versionKey: false });
+employeeSchema.set("toObject", { versionKey: false });
 
-  if (!employee) {
-    return (
-      <div className="container mt-4 text-light">
-        <p>Employee not found.</p>
-        <button className="btn btn-secondary" onClick={handleBack}>
-          Back to Employees
-        </button>
-      </div>
-    );
-  }
-
-  const fullName = `${capitalize(employee.first_name)} ${capitalize(
-    employee.last_name
-  )}`;
-
-  const formattedSalary =
-    typeof employee.salary === "number"
-      ? employee.salary.toLocaleString("en-CA", {
-          style: "currency",
-          currency: "CAD",
-        })
-      : employee.salary;
-
-  const formattedDate = employee.date_of_joining
-    ? new Date(employee.date_of_joining).toLocaleDateString("en-CA")
-    : "";
-
-  return (
-    <div className="container mt-4 text-light">
-      <div className="mb-3 d-flex justify-content-between align-items-center">
-        <h2>Employee Details</h2>
-        <button className="btn btn-secondary" onClick={handleBack}>
-          Back to Employees
-        </button>
-      </div>
-
-      <div className="card bg-dark text-light border-secondary">
-        <div className="card-body">
-          <h4 className="card-title mb-3">{fullName}</h4>
-
-          <div className="mb-2">
-            <strong>Position:</strong>{" "}
-            {employee.position ? employee.position : "-"}
-          </div>
-
-          <div className="mb-2">
-            <strong>Department:</strong>{" "}
-            {employee.department ? employee.department : "-"}
-          </div>
-
-          <div className="mb-2">
-            <strong>Email:</strong> {employee.email}
-          </div>
-
-          <div className="mb-2">
-            <strong>Salary:</strong> {formattedSalary}
-          </div>
-
-          <div className="mb-2">
-            <strong>Date of Hire:</strong> {formattedDate}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default EmployeeView;
+module.exports = mongoose.model("Employee", employeeSchema);

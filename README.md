@@ -28,6 +28,7 @@
 - Node.js
 - Express
 - MongoDB
+- Bootstrap
 - React
 - Axios
 - Multer

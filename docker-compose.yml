@@ -20,3 +20,27 @@ services:
       - comp3123-mongo
     volumes:
     - ./backend/uploads:/app/uploads 
+
+  comp3123-frontend:
+    build: ./frontend
+    container_name: comp3123-frontend
+    ports:
+      - "3001:3000"
+    depends_on:
+      - comp3123-backend
+
+  comp3123-mongo-express:
+    image: mongo-express
+    container_name: comp3123-mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: comp3123-mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+    depends_on:
+      - comp3123-mongo
